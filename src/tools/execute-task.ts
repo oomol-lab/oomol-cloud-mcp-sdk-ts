@@ -1,4 +1,4 @@
-import { OomolTaskClient } from "oomol-cloud-task-sdk";
+import { OomolTaskClient, BackoffStrategy } from "oomol-cloud-task-sdk";
 import type { ServerOptions } from "../types.js";
 
 export async function handleExecuteTask(
@@ -25,7 +25,7 @@ export async function handleExecuteTask(
         intervalMs: args.pollIntervalMs ?? 3000,
         timeoutMs: args.timeoutMs,
         backoff: {
-          strategy: "exp" as const,
+          strategy: BackoffStrategy.Exponential,
           maxIntervalMs: options.maxPollIntervalMs ?? 30000,
         },
         onProgress: (progress: number | undefined, status: string) => {

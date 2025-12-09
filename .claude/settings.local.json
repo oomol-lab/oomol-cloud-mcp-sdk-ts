@@ -7,7 +7,15 @@
       "Bash(cat node_modules/oomol-cloud-task-sdk/dist/index.d.ts)",
       "Bash(cat node_modules/oomol-cloud-task-sdk/package.json)",
       "Bash(npm run build)",
-      "Bash(npm publish --access public --otp=921028)"
+      "Bash(npm publish --access public --otp=921028)",
+      "Bash(node test-list-applets.js)",
+      "Bash(node test-mcp.js)",
+      "Bash(node test-mcp-simple.js)",
+      "Bash(npm install -g oomol-cloud-mcp-sdk@1.1.0)",
+      "Bash(node test-global-mcp.js)",
+      "Bash(npm install oomol-cloud-task-sdk@0.2.1)",
+      "Bash(cat node_modules/oomol-cloud-task-sdk/dist/types.d.ts)",
+      "Bash(npm publish --access public --otp=739215)"
     ]
   }
 }

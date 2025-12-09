@@ -33,9 +33,9 @@ export async function handleListApplets(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${options.apiKey}`,
         ...options.defaultHeaders,
       },
-      credentials: "include",
       body: JSON.stringify({
         limit: args.limit,
         skip: args.skip,

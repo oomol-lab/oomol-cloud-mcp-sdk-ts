@@ -1,6 +1,6 @@
 {
   "name": "oomol-cloud-mcp-sdk",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "MCP Server SDK for Oomol Cloud Task API",
   "license": "MIT",
   "type": "module",
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
-    "oomol-cloud-task-sdk": "^0.2.0"
+    "oomol-cloud-task-sdk": "^0.2.1"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
