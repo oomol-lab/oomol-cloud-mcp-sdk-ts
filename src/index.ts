@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { fileURLToPath } from "url";
+import { realpathSync } from "fs";
 import { OomolMcpServer } from "./server.js";
 
 // 导出主类和类型
@@ -32,8 +34,24 @@ async function main() {
   await server.run();
 }
 
+// 检查是否是直接执行（支持符号链接）
+const isMainModule = () => {
+  if (!process.argv[1]) return false;
+
+  try {
+    const scriptPath = fileURLToPath(import.meta.url);
+    // 解析符号链接到真实路径
+    const argv1Real = realpathSync(process.argv[1]);
+
+    // 比较真实路径
+    return scriptPath === argv1Real;
+  } catch (error) {
+    return false;
+  }
+};
+
 // 如果是直接执行（非 import）
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule()) {
   main().catch((error) => {
     console.error("Fatal error:", error);
     process.exit(1);

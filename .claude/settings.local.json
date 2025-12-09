@@ -15,7 +15,27 @@
       "Bash(node test-global-mcp.js)",
       "Bash(npm install oomol-cloud-task-sdk@0.2.1)",
       "Bash(cat node_modules/oomol-cloud-task-sdk/dist/types.d.ts)",
-      "Bash(npm publish --access public --otp=739215)"
+      "Bash(npm publish --access public --otp=739215)",
+      "Bash(cat package.json)",
+      "Bash(npm view oomol-cloud-task-sdk@0.2.1)",
+      "Bash(npm uninstall -g oomol-cloud-mcp-sdk)",
+      "Bash(npm install -g oomol-cloud-mcp-sdk@1.1.1)",
+      "Bash(node test-cherry.js)",
+      "Bash(OOMOL_API_KEY=\"$API_KEY\" timeout 3 oomol-mcp-server)",
+      "Bash(cat ~/.nvm/versions/node/v22.21.1/lib/node_modules/oomol-cloud-mcp-sdk/dist/index.d.ts)",
+      "Bash(node test-list-tools.js)",
+      "Bash(cat ~/.nvm/versions/node/v22.21.1/bin/oomol-mcp-server)",
+      "Bash(OOMOL_API_KEY=\"api-c656404dfec3af418c6641d165c036b4b7579826bcfa4e0cf2bf6fc7d2481a97\" oomol-mcp-server)",
+      "Bash(node -e \"\nimport { spawn } from ''child_process'';\n\nconst server = spawn(''oomol-mcp-server'', [], {\n  env: {\n    ...process.env,\n    OOMOL_API_KEY: ''api-c656404dfec3af418c6641d165c036b4b7579826bcfa4e0cf2bf6fc7d2481a97''\n  },\n  stdio: [''pipe'', ''pipe'', ''pipe'']\n});\n\nserver.stderr.on(''data'', (data) => {\n  console.log(''[stderr]:'', data.toString());\n});\n\nserver.stdout.on(''data'', (data) => {\n  console.log(''[stdout]:'', data.toString());\n});\n\nserver.on(''exit'', (code) => {\n  console.log(''Exit code:'', code);\n  process.exit(code || 0);\n});\n\nsetTimeout(() => {\n  server.kill();\n  console.log(''Timeout'');\n  process.exit(1);\n}, 3000);\n\")",
+      "Bash(npm run build:*)",
+      "Bash(node test-list-tools.js:*)",
+      "Bash(node -e \"\nimport { spawn } from ''child_process'';\n\nconst server = spawn(''node'', [''dist/index.js''], {\n  env: {\n    ...process.env,\n    OOMOL_API_KEY: ''api-c656404dfec3af418c6641d165c036b4b7579826bcfa4e0cf2bf6fc7d2481a97''\n  },\n  stdio: [''pipe'', ''pipe'', ''pipe'']\n});\n\nserver.stderr.on(''data'', (data) => {\n  console.log(''[stderr]:'', data.toString());\n});\n\nserver.stdout.on(''data'', (data) => {\n  console.log(''[stdout]:'', data.toString());\n});\n\nserver.on(''exit'', (code) => {\n  console.log(''Exit code:'', code);\n  process.exit(code || 0);\n});\n\nsetTimeout(() => {\n  server.kill();\n}, 3000);\n\")",
+      "Bash(npm uninstall:*)",
+      "Bash(npm install:*)",
+      "Bash(node -e:*)",
+      "Bash(oomol-mcp-server)",
+      "Bash(OOMOL_API_KEY=\"api-c656404dfec3af418c6641d165c036b4b7579826bcfa4e0cf2bf6fc7d2481a97\" node:*)",
+      "Bash(npm publish:*)"
     ]
   }
 }
