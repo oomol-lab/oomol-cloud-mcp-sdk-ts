@@ -1,50 +1,56 @@
 # oomol-cloud-mcp-sdk
 
-MCP Server SDK for Oomol Cloud Task API - 将 Oomol Cloud 任务执行能力封装为符合 [Model Context Protocol](https://modelcontextprotocol.io) 的工具。
+MCP Server SDK for Oomol Cloud Task API - Wrap Oomol Cloud task execution capabilities into tools compliant with the [Model Context Protocol](https://modelcontextprotocol.io).
 
-## 特性
+将 Oomol Cloud 任务执行能力封装为符合 MCP 协议的工具。
 
-- ✅ **完整的 MCP 协议支持**: 基于官方 `@modelcontextprotocol/sdk` 实现
-- ✅ **Stdio 传输**: 支持 Cherry Studio、VSCode、Claude Desktop 等 MCP Client
-- ✅ **类型安全**: 完整的 TypeScript 类型定义
-- ✅ **零业务逻辑重复**: 完全复用 `oomol-cloud-task-sdk`
-- ✅ **简洁 API**: 3 个核心 Tool 覆盖主要使用场景
+**English** | [简体中文](README.zh-CN.md)
 
-## 安装
+## Features | 特性
+
+- ✅ **Full MCP Protocol Support** | 完整的 MCP 协议支持: Built on official `@modelcontextprotocol/sdk`
+- ✅ **Stdio Transport** | Stdio 传输: Compatible with Cherry Studio, VSCode, Claude Desktop and other MCP clients
+- ✅ **Type-Safe** | 类型安全: Complete TypeScript type definitions
+- ✅ **Zero Business Logic Duplication** | 零业务逻辑重复: Fully reuses `oomol-cloud-task-sdk`
+- ✅ **Simple API** | 简洁 API: 3 core tools covering main use cases
+
+## Installation | 安装
+
+Global installation | 全局安装:
 
 ```bash
 npm install -g oomol-cloud-mcp-sdk
 ```
 
-或者在项目中作为依赖安装：
+Or as a project dependency | 或作为项目依赖:
 
 ```bash
 npm install oomol-cloud-mcp-sdk
 ```
 
-## 快速开始
+## Quick Start | 快速开始
 
-### 1. 作为 MCP Server 运行
+### 1. Run as MCP Server | 作为 MCP Server 运行
 
-设置环境变量并启动 Server：
+Set environment variable and start the server | 设置环境变量并启动服务:
 
 ```bash
 export OOMOL_API_KEY="your-api-key"
 oomol-mcp-server
 ```
 
-### 2. 在 MCP Client 中配置
+### 2. Configure in MCP Client | 在 MCP 客户端中配置
 
 #### Cherry Studio / Claude Desktop
 
-在 MCP 配置文件中添加：
+Add to MCP configuration file | 在 MCP 配置文件中添加:
 
 ```json
 {
   "mcpServers": {
     "oomol-cloud": {
       "command": "npx",
-      "args": ["oomol-cloud-mcp-sdk"],
+      "args": ["-y", "oomol-cloud-mcp-sdk"],
       "env": {
         "OOMOL_API_KEY": "your-api-key-here"
       }
@@ -55,13 +61,15 @@ oomol-mcp-server
 
 #### VSCode
 
-在 VSCode 的 MCP 配置中添加相同的配置。
+Add the same configuration to VSCode MCP settings | 在 VSCode 的 MCP 配置中添加相同配置。
 
-### 3. 使用 Tools
+### 3. Use Tools | 使用工具
 
-配置完成后，你可以在 MCP Client 中使用以下 Tools：
+After configuration, you can use the following tools in MCP Client | 配置完成后，可在 MCP 客户端中使用以下工具:
 
-#### `list_applets` - 获取可用的 Applet 列表
+#### `list_applets` - List Available Applets | 获取可用的 Applet 列表
+
+Get a list of all available Oomol Cloud API applets | 获取所有可用的 Oomol Cloud API Applet:
 
 ```json
 {
@@ -73,13 +81,13 @@ oomol-mcp-server
 }
 ```
 
-**响应**:
+**Response | 响应**:
 ```json
 [
   {
     "appletID": "abc-123",
-    "title": "图片处理 API",
-    "description": "处理图片的云函数",
+    "title": "Image Processing API",
+    "description": "Cloud function for image processing",
     "enabled": true,
     "packageId": "image-processor-1.0.0",
     "blockName": "processImage",
@@ -91,7 +99,9 @@ oomol-mcp-server
 ]
 ```
 
-#### `execute_task` - 执行任务并等待结果
+#### `execute_task` - Execute Task and Wait for Result | 执行任务并等待结果
+
+Create and execute a task, waiting for completion | 创建并执行任务，等待完成:
 
 ```json
 {
@@ -108,7 +118,7 @@ oomol-mcp-server
 }
 ```
 
-**响应**:
+**Response | 响应**:
 ```json
 {
   "taskID": "task-uuid",
@@ -119,7 +129,9 @@ oomol-mcp-server
 }
 ```
 
-#### `create_task` - 仅创建任务（不等待）
+#### `create_task` - Create Task Only (No Wait) | 仅创建任务（不等待）
+
+Create a task without waiting for results | 创建任务但不等待结果:
 
 ```json
 {
@@ -134,16 +146,16 @@ oomol-mcp-server
 }
 ```
 
-**响应**:
+**Response | 响应**:
 ```json
 {
   "taskID": "task-uuid"
 }
 ```
 
-## 编程使用
+## Programmatic Usage | 编程使用
 
-你也可以在代码中导入并使用：
+You can also import and use in code | 也可在代码中导入使用:
 
 ```typescript
 import { OomolMcpServer } from "oomol-cloud-mcp-sdk";
@@ -157,141 +169,143 @@ const server = new OomolMcpServer({
 await server.run();
 ```
 
-## 配置选项
+## Configuration Options | 配置选项
 
-### 环境变量
+### Environment Variables | 环境变量
 
-| 变量名 | 说明 | 必填 |
-|-------|------|------|
-| `OOMOL_API_KEY` | Oomol Cloud API Key | 是 |
-| `OOMOL_BASE_URL` | API 基础 URL（默认：https://cloud-task.oomol.com/v1） | 否 |
-| `MCP_SERVER_NAME` | MCP Server 名称（默认：oomol-cloud-task） | 否 |
-| `MCP_SERVER_VERSION` | MCP Server 版本（默认：1.0.0） | 否 |
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `OOMOL_API_KEY` | Oomol Cloud API Key | Yes |
+| `OOMOL_BASE_URL` | API base URL (default: `https://cloud-task.oomol.com/v1`) | No |
+| `MCP_SERVER_NAME` | MCP Server name (default: oomol-cloud-task) | No |
+| `MCP_SERVER_VERSION` | MCP Server version (default: 1.0.0) | No |
 
 ### ServerOptions
 
 ```typescript
 interface ServerOptions {
-  apiKey: string;                // 必填：API Key
-  baseUrl?: string;             // 可选：API 基础 URL
-  name?: string;                // 可选：Server 名称
-  version?: string;             // 可选：Server 版本
-  defaultHeaders?: Record<string, string>; // 可选：自定义 HTTP Headers
-  maxPollIntervalMs?: number;   // 可选：轮询最大间隔（默认 30000ms）
+  apiKey: string;                // Required: API Key
+  baseUrl?: string;             // Optional: API base URL
+  name?: string;                // Optional: Server name
+  version?: string;             // Optional: Server version
+  defaultHeaders?: Record<string, string>; // Optional: Custom HTTP headers
+  maxPollIntervalMs?: number;   // Optional: Max polling interval (default: 30000ms)
 }
 ```
 
-## Tools 详细说明
+## Tools Reference | 工具详细说明
 
 ### list_applets
 
-**用途**: 获取所有可用的 Oomol Cloud API Applet 列表
+**Purpose | 用途**: List all available Oomol Cloud API applets | 获取所有可用的 Oomol Cloud API Applet 列表
 
-**适用场景**:
+**Use Cases | 适用场景**:
 
-- 查看当前账号下所有可执行的 API
-- 获取 appletID 用于后续任务创建
-- 浏览可用的云函数
+- View all executable APIs in current account | 查看当前账号下所有可执行的 API
+- Get appletID for subsequent task creation | 获取 appletID 用于后续任务创建
+- Browse available cloud functions | 浏览可用的云函数
 
-**参数**:
+**Parameters | 参数**:
 
-| 参数 | 类型 | 必填 | 说明 |
-|-----|------|------|------|
-| `limit` | number | 否 | 返回数量限制（1-100，默认无限制） |
-| `skip` | number | 否 | 分页偏移量（默认 0） |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `limit` | number | No | Max number of applets to return (1-100, default: unlimited) \| 返回数量限制（1-100，默认无限制） |
+| `skip` | number | No | Number of applets to skip for pagination (default: 0) \| 分页偏移量（默认 0） |
 
-**返回**:
+**Returns | 返回**:
 ```typescript
 Array<{
-  appletID: string;        // API ID，用于执行任务
-  title: string;           // API 名称
-  description: string;     // 描述
-  enabled: boolean;        // 是否启用
-  packageId: string;       // 包 ID
-  blockName: string;       // Block 名称
-  presetInputs?: object;   // 预设参数
-  createdAt: string;       // 创建时间（ISO 格式）
+  appletID: string;        // API ID for executing tasks | API ID，用于执行任务
+  title: string;           // API name | API 名称
+  description: string;     // Description | 描述
+  enabled: boolean;        // Whether enabled | 是否启用
+  packageId: string;       // Package ID | 包 ID
+  blockName: string;       // Block name | Block 名称
+  presetInputs?: object;   // Preset parameters | 预设参数
+  createdAt: string;       // Creation time (ISO format) | 创建时间（ISO 格式）
 }>
 ```
 
 ### execute_task
 
-**用途**: 创建任务并等待执行完成（推荐使用）
+**Purpose | 用途**: Create a task and wait for execution completion (recommended) | 创建任务并等待执行完成（推荐使用）
 
-**适用场景**:
-- 需要立即获得任务结果
-- 任务执行时间较短（< 5 分钟）
-- 交互式操作
+**Use Cases | 适用场景**:
 
-**参数**:
+- Need immediate task results | 需要立即获得任务结果
+- Short-running tasks (< 5 minutes) | 任务执行时间较短（< 5 分钟）
+- Interactive operations | 交互式操作
 
-| 参数 | 类型 | 必填 | 说明 |
-|-----|------|------|------|
-| `appletID` | string | 是 | Applet ID |
-| `inputValues` | object | 是 | 输入参数 |
-| `webhookUrl` | string | 否 | Webhook 回调 URL |
-| `metadata` | object | 否 | 元数据 |
-| `pollIntervalMs` | number | 否 | 轮询间隔（默认 3000ms） |
-| `timeoutMs` | number | 否 | 超时时间（毫秒） |
+**Parameters | 参数**:
 
-**返回**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `appletID` | string | Yes | Applet ID |
+| `inputValues` | object | Yes | Input parameters \| 输入参数 |
+| `webhookUrl` | string | No | Webhook callback URL \| Webhook 回调 URL |
+| `metadata` | object | No | Metadata \| 元数据 |
+| `pollIntervalMs` | number | No | Polling interval (default: 3000ms) \| 轮询间隔（默认 3000ms） |
+| `timeoutMs` | number | No | Timeout in milliseconds \| 超时时间（毫秒） |
+
+**Returns | 返回**:
 ```typescript
 {
   taskID: string;
   status: "success" | "failed";
-  resultData?: unknown;  // 成功时返回
-  error?: string;        // 失败时返回
+  resultData?: unknown;  // Returned on success | 成功时返回
+  error?: string;        // Returned on failure | 失败时返回
 }
 ```
 
 ### create_task
 
-**用途**: 仅创建任务，不等待结果
+**Purpose | 用途**: Create a task only, without waiting for results | 仅创建任务，不等待结果
 
-**适用场景**:
-- 长时间任务（> 5 分钟）
-- 批量任务
-- 使用 Webhook 异步接收结果
+**Use Cases | 适用场景**:
 
-**参数**:
+- Long-running tasks (> 5 minutes) | 长时间任务（> 5 分钟）
+- Batch tasks | 批量任务
+- Use webhook for async result notification | 使用 Webhook 异步接收结果
 
-| 参数 | 类型 | 必填 | 说明 |
-|-----|------|------|------|
-| `appletID` | string | 是 | Applet ID |
-| `inputValues` | object | 是 | 输入参数 |
-| `webhookUrl` | string | 否 | Webhook 回调 URL（推荐） |
-| `metadata` | object | 否 | 元数据 |
+**Parameters | 参数**:
 
-**返回**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `appletID` | string | Yes | Applet ID |
+| `inputValues` | object | Yes | Input parameters \| 输入参数 |
+| `webhookUrl` | string | No | Webhook callback URL (recommended) \| Webhook 回调 URL（推荐） |
+| `metadata` | object | No | Metadata \| 元数据 |
+
+**Returns | 返回**:
 ```typescript
 {
   taskID: string;
 }
 ```
 
-## 错误处理
+## Error Handling | 错误处理
 
-SDK 会捕获并格式化以下错误类型：
+The SDK captures and formats the following error types | SDK 会捕获并格式化以下错误类型:
 
-- **ApiError**: HTTP 请求失败（包含状态码和响应体）
-- **TaskFailedError**: 任务执行失败（包含任务 ID 和错误详情）
-- **TimeoutError**: 超时错误
+- **ApiError**: HTTP request failure (includes status code and response body) | HTTP 请求失败（包含状态码和响应体）
+- **TaskFailedError**: Task execution failure (includes task ID and error details) | 任务执行失败（包含任务 ID 和错误详情）
+- **TimeoutError**: Timeout error | 超时错误
 
-错误响应格式：
+Error response format | 错误响应格式:
 ```json
 {
-  "error": "错误消息",
+  "error": "Error message",
   "details": {
-    "name": "错误类型",
-    "message": "详细信息",
+    "name": "Error type",
+    "message": "Detailed information",
     ...
   }
 }
 ```
 
-## 进度日志
+## Progress Logging | 进度日志
 
-使用 `execute_task` 时，任务执行进度会输出到 `stderr`（不影响 MCP 协议通信）：
+When using `execute_task`, task execution progress is output to `stderr` (does not affect MCP protocol communication) | 使用 `execute_task` 时，任务执行进度会输出到 `stderr`（不影响 MCP 协议通信）:
 
 ```
 [Task abc-123] status=running progress=25%
@@ -299,16 +313,16 @@ SDK 会捕获并格式化以下错误类型：
 [Task abc-123] status=running progress=100%
 ```
 
-## 开发
+## Development | 开发
 
-### 构建项目
+### Build Project | 构建项目
 
 ```bash
 npm install
 npm run build
 ```
 
-### 运行示例
+### Run Examples | 运行示例
 
 ```bash
 export OOMOL_API_KEY="your-key"
@@ -316,43 +330,44 @@ npm run build
 node examples/basic-server.ts
 ```
 
-## 项目结构
+## Project Structure | 项目结构
 
 ```
 oomol-cloud-mcp-sdk/
 ├── src/
-│   ├── index.ts              # 主入口
-│   ├── server.ts             # MCP Server 核心类
-│   ├── types.ts              # 类型定义
+│   ├── index.ts              # Main entry | 主入口
+│   ├── server.ts             # MCP Server core class | MCP Server 核心类
+│   ├── types.ts              # Type definitions | 类型定义
 │   ├── tools/
-│   │   ├── index.ts          # Tool 注册中心
+│   │   ├── index.ts          # Tool registry | Tool 注册中心
 │   │   ├── list-applets.ts   # list_applets Tool
 │   │   ├── execute-task.ts   # execute_task Tool
 │   │   └── create-task.ts    # create_task Tool
 │   └── utils/
-│       └── response-formatter.ts # 响应格式化
+│       └── response-formatter.ts # Response formatter | 响应格式化
 ├── examples/
-│   ├── basic-server.ts       # 基础示例
-│   └── mcp-config.json       # MCP Client 配置示例
-└── dist/                     # 编译输出
+│   ├── basic-server.ts       # Basic example | 基础示例
+│   └── mcp-config.json       # MCP Client config example | MCP 客户端配置示例
+└── dist/                     # Build output | 编译输出
 ```
 
-## 依赖
+## Dependencies | 依赖
 
-- `@modelcontextprotocol/sdk` - MCP 协议官方实现
-- `oomol-cloud-task-sdk` - Oomol Cloud Task API 客户端
-- `zod` - 参数验证库
+- `@modelcontextprotocol/sdk` - Official MCP protocol implementation | MCP 协议官方实现
+- `oomol-cloud-task-sdk` - Oomol Cloud Task API client | Oomol Cloud Task API 客户端
 
-## 相关链接
+## Related Links | 相关链接
 
 - [Model Context Protocol](https://modelcontextprotocol.io)
 - [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
 - [oomol-cloud-task-sdk](https://www.npmjs.com/package/oomol-cloud-task-sdk)
 
-## 许可证
+## License | 许可证
 
 MIT
 
-## 支持
+## Support | 支持
+
+For issues or suggestions, please submit an issue or contact us.
 
 如有问题或建议，请提交 Issue 或联系我们。
