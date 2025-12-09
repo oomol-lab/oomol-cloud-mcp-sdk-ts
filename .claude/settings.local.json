@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm whoami)",
+      "Bash(npm publish --access public)",
+      "Bash(npm publish --access public --otp=146750)",
+      "Bash(cat node_modules/oomol-cloud-task-sdk/dist/index.d.ts)",
+      "Bash(cat node_modules/oomol-cloud-task-sdk/package.json)",
+      "Bash(npm run build)",
+      "Bash(npm publish --access public --otp=921028)"
+    ]
+  }
+}

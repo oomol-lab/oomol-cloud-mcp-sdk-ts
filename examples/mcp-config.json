@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "oomol-cloud": {
+      "command": "npx",
+      "args": ["oomol-cloud-mcp-sdk"],
+      "env": {
+        "OOMOL_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
