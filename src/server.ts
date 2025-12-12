@@ -10,14 +10,14 @@ export class OomolMcpServer {
   private taskClient: OomolTaskClient;
 
   constructor(options: ServerOptions) {
-    // 初始化 Task Client
+    // Initialize Task Client
     this.taskClient = new OomolTaskClient({
       apiKey: options.apiKey,
       baseUrl: options.baseUrl,
       defaultHeaders: options.defaultHeaders,
     });
 
-    // 初始化 MCP Server
+    // Initialize MCP Server
     this.mcpServer = new Server(
       {
         name: options.name ?? "oomol-cloud-task",
@@ -25,15 +25,15 @@ export class OomolMcpServer {
       },
       {
         capabilities: {
-          tools: {}, // 支持 tools
+          tools: {}, // Support tools
         },
       }
     );
 
-    // 注册所有 Tools
+    // Register all Tools
     registerTools(this.mcpServer, this.taskClient, options);
 
-    // 注册 tools/list handler
+    // Register tools/list handler
     this.mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
         tools: [
@@ -131,7 +131,7 @@ export class OomolMcpServer {
   }
 
   /**
-   * 启动 Server（连接 Stdio Transport）
+   * Start Server (connect Stdio Transport)
    */
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
@@ -141,7 +141,7 @@ export class OomolMcpServer {
   }
 
   /**
-   * 优雅关闭
+   * Graceful shutdown
    */
   async close(): Promise<void> {
     await this.mcpServer.close();

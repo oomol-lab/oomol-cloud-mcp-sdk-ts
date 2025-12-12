@@ -29,7 +29,7 @@ export async function handleExecuteTask(
           maxIntervalMs: options.maxPollIntervalMs ?? 30000,
         },
         onProgress: (progress: number | undefined, status: string) => {
-          // 进度日志输出到 stderr（不影响 MCP 协议通信）
+          // Progress log output to stderr (does not affect MCP protocol communication)
           console.error(
             `[Task ${taskID}] status=${status} progress=${progress ?? 0}%`
           );

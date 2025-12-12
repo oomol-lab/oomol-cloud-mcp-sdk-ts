@@ -1,7 +1,7 @@
 import type { ToolResponse } from "../types.js";
 
 /**
- * 格式化成功响应
+ * Format success response
  */
 export function formatSuccessResponse(data: unknown): ToolResponse {
   return {
@@ -15,7 +15,7 @@ export function formatSuccessResponse(data: unknown): ToolResponse {
 }
 
 /**
- * 格式化错误响应
+ * Format error response
  */
 export function formatErrorResponse(error: unknown): ToolResponse {
   let errorMessage = "Unknown error";
@@ -26,7 +26,7 @@ export function formatErrorResponse(error: unknown): ToolResponse {
     errorDetails = {
       name: error.name,
       message: error.message,
-      ...(error as any), // 包含额外字段（如 ApiError 的 status）
+      ...(error as any), // Include extra fields (e.g. ApiError status)
     };
   }
 

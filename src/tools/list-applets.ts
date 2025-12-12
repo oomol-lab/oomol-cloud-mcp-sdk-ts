@@ -50,7 +50,7 @@ export async function handleListApplets(
 
     const applets = (await response.json()) as ApiApplet[];
 
-    // 格式化返回结果,提取关键信息
+    // Format result and extract key information
     const formattedApplets = applets.map((applet) => ({
       appletID: applet.apiAppletId,
       title: applet.data.title || "Untitled",

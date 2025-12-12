@@ -11,7 +11,7 @@ export function registerTools(
   taskClient: OomolTaskClient,
   options: ServerOptions
 ): void {
-  // 统一注册所有工具的 CallToolRequestSchema handler
+  // Register unified CallToolRequestSchema handler for all tools
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const toolName = request.params.name;
 

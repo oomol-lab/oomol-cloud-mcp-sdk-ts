@@ -1,28 +1,28 @@
 /**
- * MCP Server 配置选项
+ * MCP Server configuration options
  */
 export interface ServerOptions {
-  /** Oomol Cloud API Key（必填） */
+  /** Oomol Cloud API Key (required) */
   apiKey: string;
 
-  /** API Base URL（可选，默认使用 oomol-cloud-task-sdk 的默认值） */
+  /** API Base URL (optional, defaults to oomol-cloud-task-sdk default) */
   baseUrl?: string;
 
-  /** MCP Server 名称（可选，默认 "oomol-cloud-task"） */
+  /** MCP Server name (optional, defaults to "oomol-cloud-task") */
   name?: string;
 
-  /** MCP Server 版本（可选，默认 "1.0.0"） */
+  /** MCP Server version (optional, defaults to "1.0.0") */
   version?: string;
 
-  /** 自定义 HTTP Headers（可选） */
+  /** Custom HTTP Headers (optional) */
   defaultHeaders?: Record<string, string>;
 
-  /** 轮询最大间隔时间（毫秒，默认 30000） */
+  /** Maximum polling interval in milliseconds (default: 30000) */
   maxPollIntervalMs?: number;
 }
 
 /**
- * Tool 响应内容类型
+ * Tool response content type
  */
 export interface ToolResponse {
   content: Array<{

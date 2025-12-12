@@ -35,7 +35,8 @@
       "Bash(node -e:*)",
       "Bash(oomol-mcp-server)",
       "Bash(OOMOL_API_KEY=\"api-c656404dfec3af418c6641d165c036b4b7579826bcfa4e0cf2bf6fc7d2481a97\" node:*)",
-      "Bash(npm publish:*)"
+      "Bash(npm publish:*)",
+      "Bash(git add:*)"
     ]
   }
 }
