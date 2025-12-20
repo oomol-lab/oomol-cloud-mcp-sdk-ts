@@ -1,15 +1,19 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { OomolTaskClient } from "oomol-cloud-task-sdk";
-import { registerTools } from "./tools/index.js";
+import { handleListApplets } from "./tools/list-applets.js";
+import { handleExecuteTask } from "./tools/execute-task.js";
+import { handleCreateTask } from "./tools/create-task.js";
 import type { ServerOptions } from "./types.js";
 
 export class OomolMcpServer {
-  private mcpServer: Server;
+  private mcpServer: McpServer;
   private taskClient: OomolTaskClient;
+  private options: ServerOptions;
 
   constructor(options: ServerOptions) {
+    this.options = options;
+
     // Initialize Task Client
     this.taskClient = new OomolTaskClient({
       apiKey: options.apiKey,
@@ -17,8 +21,8 @@ export class OomolMcpServer {
       defaultHeaders: options.defaultHeaders,
     });
 
-    // Initialize MCP Server
-    this.mcpServer = new Server(
+    // Initialize MCP Server with high-level API
+    this.mcpServer = new McpServer(
       {
         name: options.name ?? "oomol-cloud-task",
         version: options.version ?? "1.0.0",
@@ -30,104 +34,49 @@ export class OomolMcpServer {
       }
     );
 
-    // Register all Tools
-    registerTools(this.mcpServer, this.taskClient, options);
+    // Register all tools
+    this.registerTools();
+  }
 
-    // Register tools/list handler
-    this.mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
-      return {
-        tools: [
-          {
-            name: "list_applets",
-            description:
-              "List all available Oomol Cloud API applets with their IDs, titles, and descriptions",
-            inputSchema: {
-              type: "object",
-              properties: {
-                limit: {
-                  type: "number",
-                  description:
-                    "Maximum number of applets to return (1-100, default: unlimited)",
-                  minimum: 1,
-                  maximum: 100,
-                },
-                skip: {
-                  type: "number",
-                  description: "Number of applets to skip for pagination (default: 0)",
-                  minimum: 0,
-                  default: 0,
-                },
-              },
-            },
-          },
-          {
-            name: "execute_task",
-            description:
-              "Create and execute an Oomol Cloud task, wait for completion, and return the result",
-            inputSchema: {
-              type: "object",
-              properties: {
-                appletID: {
-                  type: "string",
-                  description: "Applet ID to execute",
-                },
-                inputValues: {
-                  type: "object",
-                  description: "Input parameters for the applet",
-                },
-                webhookUrl: {
-                  type: "string",
-                  description:
-                    "Optional webhook URL for completion notification",
-                },
-                metadata: {
-                  type: "object",
-                  description: "Optional metadata",
-                },
-                pollIntervalMs: {
-                  type: "number",
-                  description: "Polling interval in milliseconds (default: 3000)",
-                  default: 3000,
-                },
-                timeoutMs: {
-                  type: "number",
-                  description: "Maximum wait time in milliseconds",
-                },
-              },
-              required: ["appletID", "inputValues"],
-            },
-          },
-          {
-            name: "create_task",
-            description:
-              "Create an Oomol Cloud task without waiting for completion (use webhook for async notification)",
-            inputSchema: {
-              type: "object",
-              properties: {
-                appletID: {
-                  type: "string",
-                  description: "Applet ID to execute",
-                },
-                inputValues: {
-                  type: "object",
-                  description: "Input parameters for the applet",
-                },
-                webhookUrl: {
-                  type: "string",
-                  description:
-                    "Optional webhook URL for completion notification",
-                },
-                metadata: {
-                  type: "object",
-                  description: "Optional metadata",
-                },
-              },
-              required: ["appletID", "inputValues"],
-            },
-          },
-        ],
-      };
-    });
+  /**
+   * Register all tools using the underlying Server API for better control
+   */
+  private registerTools(): void {
+    // Register list_applets tool
+    this.mcpServer.registerTool(
+      "list_applets",
+      {
+        description:
+          "List all available Oomol Cloud API applets with their IDs, titles, and descriptions",
+      },
+      async (args: any) => {
+        return await handleListApplets(args, this.taskClient, this.options);
+      }
+    );
+
+    // Register execute_task tool
+    this.mcpServer.registerTool(
+      "execute_task",
+      {
+        description:
+          "Create and execute an Oomol Cloud task, wait for completion, and return the result",
+      },
+      async (args: any) => {
+        return await handleExecuteTask(args, this.taskClient, this.options);
+      }
+    );
+
+    // Register create_task tool
+    this.mcpServer.registerTool(
+      "create_task",
+      {
+        description:
+          "Create an Oomol Cloud task without waiting for completion (use webhook for async notification)",
+      },
+      async (args: any) => {
+        return await handleCreateTask(args, this.taskClient);
+      }
+    );
   }
 
   /**
