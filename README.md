@@ -1,26 +1,18 @@
 # oomol-cloud-mcp-sdk
 
-MCP Server SDK for Oomol Cloud Task API - Wrap Oomol Cloud task execution capabilities into tools compliant with the [Model Context Protocol](https://modelcontextprotocol.io).
+MCP server SDK for Oomol Cloud Task API v3. This package now aligns with [`oomol-cloud-task-sdk`](https://www.npmjs.com/package/oomol-cloud-task-sdk): it re-exports the full Cloud Task TypeScript SDK surface and adds MCP server support on top.
 
 **English** | [简体中文](README.zh-CN.md)
 
 ## Features
 
-- ✅ **Full MCP Protocol Support**: Built on official `@modelcontextprotocol/sdk`
-- ✅ **Stdio Transport**: Compatible with Cherry Studio, VSCode, Claude Desktop and other MCP clients
-- ✅ **Type-Safe**: Complete TypeScript type definitions
-- ✅ **Zero Business Logic Duplication**: Fully reuses `oomol-cloud-task-sdk`
-- ✅ **Simple API**: 3 core tools covering main use cases
+- Full MCP server support based on `@modelcontextprotocol/sdk`
+- Re-exports the full `oomol-cloud-task-sdk` API, types, and errors
+- Uses the same serverless task model as the Cloud Task TS SDK
+- Provides MCP tools for task creation, execution, querying, queue control, and upload
+- Keeps backward-compatible aliases for `create_block_task` and `execute_block_task`
 
 ## Installation
-
-Global installation:
-
-```bash
-npm install -g oomol-cloud-mcp-sdk
-```
-
-Or as a project dependency:
 
 ```bash
 npm install oomol-cloud-mcp-sdk
@@ -28,20 +20,21 @@ npm install oomol-cloud-mcp-sdk
 
 ## Quick Start
 
-### 1. Run as MCP Server
-
-Set environment variable and start the server:
+### Run as an MCP server
 
 ```bash
 export OOMOL_API_KEY="your-api-key"
 oomol-mcp-server
 ```
 
-### 2. Configure in MCP Client
+If you want MCP task tools to default to a package, also set:
 
-#### Cherry Studio / Claude Desktop
+```bash
+export OOMOL_PACKAGE_NAME="@oomol/your-package"
+export OOMOL_PACKAGE_VERSION="1.0.0"
+```
 
-Add to MCP configuration file:
+### Configure an MCP client
 
 ```json
 {
@@ -50,320 +43,173 @@ Add to MCP configuration file:
       "command": "npx",
       "args": ["-y", "oomol-cloud-mcp-sdk"],
       "env": {
-        "OOMOL_API_KEY": "your-api-key-here"
+        "OOMOL_API_KEY": "your-api-key-here",
+        "OOMOL_PACKAGE_NAME": "@oomol/your-package",
+        "OOMOL_PACKAGE_VERSION": "1.0.0"
       }
     }
   }
 }
 ```
 
-#### VSCode
-
-Add the same configuration to VSCode MCP settings.
-
-### 3. Use Tools
-
-After configuration, you can use the following tools in MCP Client:
-
-#### `list_applets` - List Available Applets
-
-Get a list of all available Oomol Cloud API applets:
-
-```json
-{
-  "name": "list_applets",
-  "arguments": {
-    "limit": 10,
-    "skip": 0
-  }
-}
-```
-
-**Response**:
-```json
-[
-  {
-    "appletID": "abc-123",
-    "title": "Image Processing API",
-    "description": "Cloud function for image processing",
-    "enabled": true,
-    "packageId": "image-processor-1.0.0",
-    "blockName": "processImage",
-    "presetInputs": {
-      "quality": 80
-    },
-    "createdAt": "2024-12-09T12:00:00.000Z"
-  }
-]
-```
-
-#### `execute_task` - Execute Task and Wait for Result
-
-Create and execute a task, waiting for completion:
-
-```json
-{
-  "name": "execute_task",
-  "arguments": {
-    "appletID": "your-applet-id",
-    "inputValues": {
-      "input_param1": "value1",
-      "input_param2": "value2"
-    },
-    "pollIntervalMs": 2000,
-    "timeoutMs": 300000
-  }
-}
-```
-
-**Response**:
-```json
-{
-  "taskID": "task-uuid",
-  "status": "success",
-  "resultData": {
-    "output": "..."
-  }
-}
-```
-
-#### `create_task` - Create Task Only (No Wait)
-
-Create a task without waiting for results:
-
-```json
-{
-  "name": "create_task",
-  "arguments": {
-    "appletID": "your-applet-id",
-    "inputValues": {
-      "input_param1": "value1"
-    },
-    "webhookUrl": "https://your-webhook.com/callback"
-  }
-}
-```
-
-**Response**:
-```json
-{
-  "taskID": "task-uuid"
-}
-```
-
 ## Programmatic Usage
 
-You can also import and use in code:
+### Use it as the Cloud Task TS SDK
 
-```typescript
+```ts
+import { OomolTaskClient } from "oomol-cloud-mcp-sdk";
+
+const client = new OomolTaskClient({
+  apiKey: process.env.OOMOL_API_KEY,
+});
+
+const { taskID, result } = await client.createAndWait({
+  packageName: "@oomol/my-package",
+  packageVersion: "1.0.0",
+  blockName: "main",
+  inputValues: { text: "hello" },
+});
+```
+
+### Run the MCP server programmatically
+
+```ts
 import { OomolMcpServer } from "oomol-cloud-mcp-sdk";
 
 const server = new OomolMcpServer({
-  apiKey: "your-api-key",
-  name: "my-server",
-  version: "1.0.0",
+  apiKey: process.env.OOMOL_API_KEY,
+  packageName: process.env.OOMOL_PACKAGE_NAME,
+  packageVersion: process.env.OOMOL_PACKAGE_VERSION,
 });
 
 await server.run();
 ```
 
-## Configuration Options
+`server.taskClient` exposes the underlying `OomolTaskClient` instance.
 
-### Environment Variables
+## MCP Tools
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `OOMOL_API_KEY` | Oomol Cloud API Key | Yes |
-| `OOMOL_BASE_URL` | API base URL (default: `https://cloud-task.oomol.com/v1`) | No |
-| `MCP_SERVER_NAME` | MCP Server name (default: oomol-cloud-task) | No |
-| `MCP_SERVER_VERSION` | MCP Server version (default: 1.0.0) | No |
+Core tools aligned with the Cloud Task TS SDK:
 
-### ServerOptions
+- `create_task`
+- `execute_task`
+- `list_tasks`
+- `get_latest_tasks`
+- `get_task`
+- `get_task_result`
+- `await_result`
+- `get_dashboard`
+- `set_tasks_pause`
+- `pause_user_queue`
+- `resume_user_queue`
+- `upload_file`
 
-```typescript
-interface ServerOptions {
-  apiKey: string;                // Required: API Key
-  baseUrl?: string;             // Optional: API base URL
-  name?: string;                // Optional: Server name
-  version?: string;             // Optional: Server version
-  defaultHeaders?: Record<string, string>; // Optional: Custom HTTP headers
-  maxPollIntervalMs?: number;   // Optional: Max polling interval (default: 30000ms)
-}
-```
+Backward-compatible aliases:
 
-## Tools Reference
+- `create_block_task` -> `create_task`
+- `execute_block_task` -> `execute_task`
 
-### list_applets
+### `create_task`
 
-**Purpose**: List all available Oomol Cloud API applets
+Uses the same request shape as `OomolTaskClient.createTask()`, with optional `packageName` and `packageVersion` defaults from server config.
 
-**Use Cases**:
-
-- View all executable APIs in current account
-- Get appletID for subsequent task creation
-- Browse available cloud functions
-
-**Parameters**:
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `limit` | number | No | Max number of applets to return (1-100, default: unlimited) |
-| `skip` | number | No | Number of applets to skip for pagination (default: 0) |
-
-**Returns**:
-```typescript
-Array<{
-  appletID: string;        // API ID for executing tasks
-  title: string;           // API name
-  description: string;     // Description
-  enabled: boolean;        // Whether enabled
-  packageId: string;       // Package ID
-  blockName: string;       // Block name
-  presetInputs?: object;   // Preset parameters
-  createdAt: string;       // Creation time (ISO format)
-}>
-```
-
-### execute_task
-
-**Purpose**: Create a task and wait for execution completion (recommended)
-
-**Use Cases**:
-
-- Need immediate task results
-- Short-running tasks (< 5 minutes)
-- Interactive operations
-
-**Parameters**:
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `appletID` | string | Yes | Applet ID |
-| `inputValues` | object | Yes | Input parameters |
-| `webhookUrl` | string | No | Webhook callback URL |
-| `metadata` | object | No | Metadata |
-| `pollIntervalMs` | number | No | Polling interval (default: 3000ms) |
-| `timeoutMs` | number | No | Timeout in milliseconds |
-
-**Returns**:
-```typescript
-{
-  taskID: string;
-  status: "success" | "failed";
-  resultData?: unknown;  // Returned on success
-  error?: string;        // Returned on failure
-}
-```
-
-### create_task
-
-**Purpose**: Create a task only, without waiting for results
-
-**Use Cases**:
-
-- Long-running tasks (> 5 minutes)
-- Batch tasks
-- Use webhook for async result notification
-
-**Parameters**:
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `appletID` | string | Yes | Applet ID |
-| `inputValues` | object | Yes | Input parameters |
-| `webhookUrl` | string | No | Webhook callback URL (recommended) |
-| `metadata` | object | No | Metadata |
-
-**Returns**:
-```typescript
-{
-  taskID: string;
-}
-```
-
-## Error Handling
-
-The SDK captures and formats the following error types:
-
-- **ApiError**: HTTP request failure (includes status code and response body)
-- **TaskFailedError**: Task execution failure (includes task ID and error details)
-- **TimeoutError**: Timeout error
-
-Error response format:
 ```json
 {
-  "error": "Error message",
-  "details": {
-    "name": "Error type",
-    "message": "Detailed information",
-    ...
+  "name": "create_task",
+  "arguments": {
+    "blockName": "main",
+    "inputValues": {
+      "text": "hello"
+    }
   }
 }
 ```
 
-## Progress Logging
+### `execute_task`
 
-When using `execute_task`, task execution progress is output to `stderr` (does not affect MCP protocol communication):
+Uses the same task payload as `create_task`, plus polling controls:
 
+```json
+{
+  "name": "execute_task",
+  "arguments": {
+    "blockName": "main",
+    "inputValues": {
+      "text": "hello"
+    },
+    "intervalMs": 2000,
+    "timeoutMs": 300000
+  }
+}
 ```
-[Task abc-123] status=running progress=25%
-[Task abc-123] status=running progress=50%
-[Task abc-123] status=running progress=100%
+
+### Query and control tools
+
+- `list_tasks` accepts the same filters as `listTasks(query?)`
+- `get_latest_tasks` accepts `workloadIDs: string[] | string`
+- `await_result` accepts `taskID`, `intervalMs`, and `timeoutMs`
+- `set_tasks_pause` accepts `{ "paused": true | false }`
+
+### `upload_file`
+
+Accepts a base64-encoded file payload:
+
+```json
+{
+  "name": "upload_file",
+  "arguments": {
+    "fileName": "example.txt",
+    "fileData": "SGVsbG8gd29ybGQ=",
+    "mimeType": "text/plain"
+  }
+}
+```
+
+## Exports
+
+This package exports:
+
+- `OomolMcpServer`
+- `ServerOptions`
+- `ToolResponse`
+- Everything from `oomol-cloud-task-sdk`
+
+That includes `OomolTaskClient`, all Cloud Task types, `BackoffStrategy`, and error classes such as `ApiError`, `TaskFailedError`, `TimeoutError`, and `UploadError`.
+
+## Configuration
+
+### Environment variables
+
+| Variable | Description | Required |
+| --- | --- | --- |
+| `OOMOL_API_KEY` | Oomol Cloud API key, typically required for MCP server usage in Node.js | Usually |
+| `OOMOL_BASE_URL` | Cloud Task API base URL | No |
+| `OOMOL_PACKAGE_NAME` | Default package name for MCP task tools | No |
+| `OOMOL_PACKAGE_VERSION` | Default package version for MCP task tools | No |
+| `MCP_SERVER_NAME` | MCP server name | No |
+| `MCP_SERVER_VERSION` | MCP server version | No |
+
+### `ServerOptions`
+
+`ServerOptions` extends `ClientOptions` from `oomol-cloud-task-sdk` and adds:
+
+```ts
+interface ServerOptions extends ClientOptions {
+  name?: string;
+  version?: string;
+  packageName?: string;
+  packageVersion?: string;
+  maxPollIntervalMs?: number;
+}
 ```
 
 ## Development
-
-### Build Project
 
 ```bash
 npm install
 npm run build
 ```
 
-### Run Examples
-
-```bash
-export OOMOL_API_KEY="your-key"
-npm run build
-node examples/basic-server.ts
-```
-
-## Project Structure
-
-```
-oomol-cloud-mcp-sdk/
-├── src/
-│   ├── index.ts              # Main entry
-│   ├── server.ts             # MCP Server core class
-│   ├── types.ts              # Type definitions
-│   ├── tools/
-│   │   ├── index.ts          # Tool registry
-│   │   ├── list-applets.ts   # list_applets Tool
-│   │   ├── execute-task.ts   # execute_task Tool
-│   │   └── create-task.ts    # create_task Tool
-│   └── utils/
-│       └── response-formatter.ts # Response formatter
-├── examples/
-│   ├── basic-server.ts       # Basic example
-│   └── mcp-config.json       # MCP Client config example
-└── dist/                     # Build output
-```
-
-## Dependencies
-
-- `@modelcontextprotocol/sdk` - Official MCP protocol implementation
-- `oomol-cloud-task-sdk` - Oomol Cloud Task API client
-
-## Related Links
-
-- [Model Context Protocol](https://modelcontextprotocol.io)
-- [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
-- [oomol-cloud-task-sdk](https://www.npmjs.com/package/oomol-cloud-task-sdk)
-
 ## License
 
 MIT
-
-## Support
-
-For issues or suggestions, please submit an issue or contact us.

@@ -1,57 +1,30 @@
-import { OomolTaskClient } from "oomol-cloud-task-sdk";
+import type { OomolTaskClient } from "oomol-cloud-task-sdk";
+import type { ServerOptions } from "../types.js";
+import { formatErrorResponse, formatSuccessResponse } from "../utils/response-formatter.js";
+import { resolveCreateTaskRequest } from "./shared.js";
 
 export async function handleCreateTask(
   args: {
-    appletID: string;
-    inputValues: Record<string, unknown>;
+    blockName: string;
+    packageName?: string;
+    packageVersion?: string;
+    inputValues?: Record<string, unknown>;
     webhookUrl?: string;
     metadata?: Record<string, unknown>;
+    type?: "serverless";
   },
-  taskClient: OomolTaskClient
+  taskClient: OomolTaskClient,
+  options: ServerOptions
 ) {
   try {
-    const { taskID } = await taskClient.createTask({
-      appletID: args.appletID,
-      inputValues: args.inputValues,
-      webhookUrl: args.webhookUrl,
-      metadata: args.metadata,
+    const request = resolveCreateTaskRequest(args, options);
+    const response = await taskClient.createTask(request);
+
+    return formatSuccessResponse({
+      taskID: response.taskID,
+      request,
     });
-
-    return {
-      content: [
-        {
-          type: "text" as const,
-          text: JSON.stringify({ taskID }, null, 2),
-        },
-      ],
-    };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    const errorDetails =
-      error instanceof Error
-        ? {
-            name: error.name,
-            message: error.message,
-            ...(error as any),
-          }
-        : error;
-
-    return {
-      content: [
-        {
-          type: "text" as const,
-          text: JSON.stringify(
-            {
-              error: errorMessage,
-              details: errorDetails,
-            },
-            null,
-            2
-          ),
-        },
-      ],
-      isError: true,
-    };
+    return formatErrorResponse(error);
   }
 }

@@ -4,24 +4,20 @@ import { fileURLToPath } from "url";
 import { realpathSync } from "fs";
 import { OomolMcpServer } from "./server.js";
 
-// Export main class and types
+// Export MCP server plus the full Cloud Task SDK surface.
 export { OomolMcpServer } from "./server.js";
 export type { ServerOptions, ToolResponse } from "./types.js";
+export * from "oomol-cloud-task-sdk";
 
 // CLI entry point (when run as executable)
 async function main() {
-  const apiKey = process.env.OOMOL_API_KEY;
-
-  if (!apiKey) {
-    console.error("Error: OOMOL_API_KEY environment variable is required");
-    process.exit(1);
-  }
-
   const server = new OomolMcpServer({
-    apiKey,
+    apiKey: process.env.OOMOL_API_KEY,
     baseUrl: process.env.OOMOL_BASE_URL,
     name: process.env.MCP_SERVER_NAME,
     version: process.env.MCP_SERVER_VERSION,
+    packageName: process.env.OOMOL_PACKAGE_NAME,
+    packageVersion: process.env.OOMOL_PACKAGE_VERSION,
   });
 
   // Graceful shutdown handler

@@ -36,7 +36,15 @@
       "Bash(oomol-mcp-server)",
       "Bash(OOMOL_API_KEY=\"api-c656404dfec3af418c6641d165c036b4b7579826bcfa4e0cf2bf6fc7d2481a97\" node:*)",
       "Bash(npm publish:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npm whoami:*)",
+      "Bash(git push:*)",
+      "Bash(cat:*)",
+      "Bash(git restore:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nrefactor: migrate from deprecated Server to McpServer API for v1.1.4\n\n- Replace deprecated Server class with McpServer high-level API\n- Remove tools/index.ts and integrate tool registration into OomolMcpServer class\n- Use McpServer.registerTool\\(\\) method for cleaner tool registration\n- Eliminate deprecation warnings from @modelcontextprotocol/sdk\n- Maintain backward compatibility with existing tool handlers\nEOF\n\\)\")",
+      "Bash(git tag:*)",
+      "Bash(npm publish)"
     ]
   }
 }
